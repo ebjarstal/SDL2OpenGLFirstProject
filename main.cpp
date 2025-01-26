@@ -33,6 +33,11 @@ int main(int argc, char* argv[]) {
 				// sym: virtual key
 				// Usage depends on purpose of program: is the keyboard layout important?
 				if (event.key.keysym.sym == SDLK_LEFT) std::cout << "left arrow down\n";
+
+				// get an array of which the length is the number of existing scancodes
+				// array[key_scancode] is 0 when key is not pressed, 1 when pressed
+				const Uint8* kb_state = SDL_GetKeyboardState(nullptr);
+				if (kb_state[SDL_SCANCODE_F] != 0) std::cout << "f key down\n";
 			}
 		}
 	}
