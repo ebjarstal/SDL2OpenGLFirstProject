@@ -4,6 +4,15 @@
 #define W_WIDTH 1280
 #define W_HEIGHT 720
 
+void PaintPixel(SDL_Surface* surface, uint8_t r, uint8_t g, uint8_t b) {
+	int x, y;
+	SDL_GetMouseState(&x, &y);
+	uint8_t* pixels = (uint8_t*) surface->pixels;
+	pixels[y * surface->pitch + x * surface->format->BytesPerPixel + 0] = b;
+	pixels[y * surface->pitch + x * surface->format->BytesPerPixel + 1] = g;
+	pixels[y * surface->pitch + x * surface->format->BytesPerPixel + 2] = r;
+}
+
 int main(int argc, char* argv[]) {
 
 	SDL_Window*  window  = nullptr;
@@ -25,10 +34,8 @@ int main(int argc, char* argv[]) {
 		std::cout << "SDL window surface fetch: FAIL\n";
 	}
 
-	SDL_Surface* image = SDL_LoadBMP("./cars.bmp");
-	SDL_BlitSurface(image, nullptr, surface, nullptr);
-	SDL_FreeSurface(image);
-	SDL_UpdateWindowSurface(window);
+	std::cout << "Press 'r' for red, 'g' for green, and 'b' for blue. Press mouse left button to paint.\n";
+	uint8_t r = 0x00, g = 0x00, b = 0x00;
 
 	bool is_running = true;
 	while (is_running) {
@@ -38,17 +45,26 @@ int main(int argc, char* argv[]) {
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) is_running = false;
 			if (event.type == SDL_KEYDOWN) {
-				// scancode: physical key
-				// sym: virtual key
-				// Usage depends on purpose of program: is the keyboard layout important?
-				if (event.key.keysym.sym == SDLK_LEFT) std::cout << "left arrow down\n";
+				// TODO: make red mode by default
+				if (event.key.keysym.sym == SDLK_r) {
+					std::cout << "Color set to 'red'\n";
+					r = 0xff; g = 0x00; b = 0x00;
+				}
+				if (event.key.keysym.sym == SDLK_g) {
+					std::cout << "Color set to 'green'\n";
+					r = 0x00; g = 0xff; b = 0x00;
+				}
+				if (event.key.keysym.sym == SDLK_b) {
+					std::cout << "Color set to 'blue'\n";
+					r = 0x00; g = 0x00; b = 0xff;
+				}
 			}
-			// get an array of which the length is the number of existing scancodes
-			// array[key_scancode] is 0 when key is not pressed, 1 when pressed
-			const Uint8* kb_state = SDL_GetKeyboardState(nullptr);
-			if (kb_state[SDL_SCANCODE_F] == 1) std::cout << "f key down\n";
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				PaintPixel(surface, r, g, b);
+			}
 		}
 
+		SDL_UpdateWindowSurface(window);
 	}
 
 	SDL_DestroyWindow(window);
