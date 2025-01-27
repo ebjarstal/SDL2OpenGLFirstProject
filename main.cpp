@@ -7,7 +7,6 @@
 #define BRUSH_DEFAULT_SIZE 50
 
 enum CURSOR_MODE {
-	ERASER,
 	BRUSH
 };
 
@@ -60,9 +59,10 @@ int main(int argc, char* argv[]) {
 
 	CURSOR_MODE cursor_mode = BRUSH;
 	unsigned int brush_size = BRUSH_DEFAULT_SIZE;
+	uint8_t r = 0x00, g = 0x00, b = 0x00;
+
 	std::cout << "Press 'r' for red, 'g' for green, 'b' for blue, 'e' for eraser. Press mouse left button to use brush.\n";
 	std::cout << "Use mouse wheel to modify size of brush.\n";
-	uint8_t r = 0x00, g = 0x00, b = 0x00;
 
 	bool is_running = true;
 	while (is_running) {
@@ -90,12 +90,12 @@ int main(int argc, char* argv[]) {
 				}
 				if (event.key.keysym.sym == SDLK_e) {
 					std::cout << "Brush set to 'eraser'\n";
-					cursor_mode = ERASER;
+					r = 0x00; g = 0x00; b = 0x00;
+					cursor_mode = BRUSH;
 				}
 			}
 			if (event.button.button == SDL_BUTTON_LEFT) {
 				if (cursor_mode == BRUSH) PaintArea(surface, brush_size, r, g, b);
-				if (cursor_mode == ERASER) PaintArea(surface, brush_size, 0x00, 0x00, 0x00);
 			}
 			if (event.type == SDL_MOUSEWHEEL) {
 				if (event.wheel.y < 0) {
